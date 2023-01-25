@@ -1,21 +1,29 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'pages/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'pages/reminder.dart';
-import 'logic/config.dart';
+import 'firebase_options.dart';
 
-void main() {
-  var config = Config(System.device);
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+
   runApp(
-    MaterialApp(
-      home: Alfred(config),
+    const MaterialApp(
+      home: Alfred(),
       debugShowCheckedModeBanner: false,
     ),
   );
 }
 
 class Alfred extends StatefulWidget {
-  const Alfred(Config config, {super.key});
+  const Alfred({super.key});
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -47,35 +55,42 @@ class _MyHomePageState extends State<Alfred> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBody: true,
-      body: PageView(
-        controller: controller,
-        onPageChanged: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        children: <Widget>[
-          MyPage1(
-            bgc: colors[0],
-            key: ValueKey(_selectedIndex == 0 ? "page1" : "page1_dismissed"),
-            nbr: 'One',
-          ),
-          ReminderPage(
-            bgc: colors[1],
-            key: ValueKey(_selectedIndex == 1 ? "page2" : "page2_dismissed"),
-            nbr: 'Reminders',
-          ),
-          SettingsPage(
-            bgc: colors[2],
-            key: ValueKey(_selectedIndex == 2 ? "page3" : "page3_dismissed"),
-            nbr: 'Tree',
-          ),
-        ],
-      ),
-      bottomNavigationBar: navbar(),
-    );
+    return StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          return Scaffold(
+            extendBody: true,
+            body: PageView(
+              controller: controller,
+              onPageChanged: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              },
+              children: <Widget>[
+                MyPage1(
+                  bgc: colors[0],
+                  key: ValueKey(
+                      _selectedIndex == 0 ? "page1" : "page1_dismissed"),
+                  nbr: 'One',
+                ),
+                ReminderPage(
+                  bgc: colors[1],
+                  key: ValueKey(
+                      _selectedIndex == 1 ? "page2" : "page2_dismissed"),
+                  nbr: 'Reminders',
+                ),
+                SettingsPage(
+                  bgc: colors[2],
+                  key: ValueKey(
+                      _selectedIndex == 2 ? "page3" : "page3_dismissed"),
+                  nbr: 'Tree',
+                ),
+              ],
+            ),
+            bottomNavigationBar: navbar(),
+          );
+        });
   }
 
   Widget navbar() {

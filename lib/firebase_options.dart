@@ -48,7 +48,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyCacDcLcTz0cDXW8PtceSTuBvZgpgYkT08',
-    appId: '1:909558811761:web:7493402576ffbac8f85fd0',
+    appId: '1:909558811761:web:384b3fece3f8cfaaf85fd0',
     messagingSenderId: '909558811761',
     projectId: 'alfred-mkrabs',
     authDomain: 'alfred-mkrabs.firebaseapp.com',
@@ -57,7 +57,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCET-E1Emy_pI4liO0Os6aLBpc7wNFxpBs',
-    appId: '1:909558811761:android:8ccef4287a085b44f85fd0',
+    appId: '1:909558811761:android:d701d2c12c84850bf85fd0',
     messagingSenderId: '909558811761',
     projectId: 'alfred-mkrabs',
     storageBucket: 'alfred-mkrabs.appspot.com',
@@ -65,7 +65,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDPWh7Ymnbe7JUyu681In-vUBSA5lqHhzE',
-    appId: '1:909558811761:ios:8563e33ec94e2cc2f85fd0',
+    appId: '1:909558811761:ios:1dafc4ee81fd8bfef85fd0',
     messagingSenderId: '909558811761',
     projectId: 'alfred-mkrabs',
     storageBucket: 'alfred-mkrabs.appspot.com',

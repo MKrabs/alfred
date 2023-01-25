@@ -41,6 +41,7 @@ dependencies:
   firebase_auth: ^4.2.5
   line_icons: ^2.0.1
   shared_preferences: ^2.0.17
+  font_awesome_flutter: ^10.3.0
 
 dev_dependencies:
   flutter_test:
