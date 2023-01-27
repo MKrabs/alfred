@@ -15,9 +15,12 @@ void main() async {
 
 
   runApp(
-    const MaterialApp(
-      home: Alfred(),
+    MaterialApp(
+      home: const Alfred(),
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: true,
+      ),
     ),
   );
 }
