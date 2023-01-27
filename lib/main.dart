@@ -84,7 +84,6 @@ class _MyHomePageState extends State<Alfred> {
                   bgc: colors[2],
                   key: ValueKey(
                       _selectedIndex == 2 ? "page3" : "page3_dismissed"),
-                  nbr: 'Tree',
                 ),
               ],
             ),

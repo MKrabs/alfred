@@ -153,27 +153,20 @@ class _ReminderPageState extends State<ReminderPage> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Flexible(
-            child: SafeArea(
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height,
-                child: ListView.builder(
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: ReminderPage.reminders.length + 1,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index == ReminderPage.reminders.length) {
-                      return addReminderButton();
-                    }
-                    return reminderCard(index);
-                  },
-                ),
+      physics: NeverScrollableScrollPhysics(),
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height,
+        child: ReminderPage.reminders.isEmpty
+            ? const Center(
+                child: Text("No reminders :)"),
+              )
+            : ListView.builder(
+                physics: const BouncingScrollPhysics(),
+                itemCount: ReminderPage.reminders.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return reminderCard(index);
+                },
               ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -197,8 +190,7 @@ class _ReminderPageState extends State<ReminderPage> {
     return Card(
       child: ListTile(
         title: Text(ReminderPage.reminders[index].title),
-        subtitle: Text(
-            "${ReminderPage.reminders[index].description}"),
+        subtitle: Text("${ReminderPage.reminders[index].description}"),
         trailing: Text(ReminderPage.reminders[index].date.weekday.toString()),
         onTap: () {
           showReminder(context, index);

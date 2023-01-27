@@ -5,7 +5,6 @@ class Reminder {
   final String title;
   final String? description;
   final DateTime date;
-  final TimeOfDay time;
   final Repeat repeat;
   final int? category;
   final bool isCompleted;
@@ -18,7 +17,6 @@ class Reminder {
     required this.title,
     this.description,
     required this.date,
-    required this.time,
     required this.repeat,
     required this.category,
     this.completedTime,
@@ -33,7 +31,6 @@ class Reminder {
       'title': title,
       'description': description,
       'date': date.toIso8601String(),
-      'time': time.toString(),
       'repeat': repeat.toString(),
       'category': category,
       'isCompleted': isCompleted,
