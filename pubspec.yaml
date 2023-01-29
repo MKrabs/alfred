@@ -43,6 +43,9 @@ dependencies:
   shared_preferences: ^2.0.17
   font_awesome_flutter: ^10.3.0
   cloud_firestore: ^4.3.1
+  uuid: ^3.0.7
+  flutter_adaptive_scaffold: ^0.1.0
+  flutter_animate: ^3.0.0
 
 dev_dependencies:
   flutter_test:

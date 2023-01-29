@@ -1,51 +1,50 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class Reminder {
-  final int id;
+  late final int id;
+  int? parentId;
   final String title;
   final String? description;
-  final DateTime date;
+  late final DateTime createdAt;
+  final DateTime? date;
   final Repeat repeat;
   final int? category;
-  final bool isCompleted;
-  final TimeOfDay? completedTime;
-  final DateTime? completedAt;
-  List<Reminder> children;
+  late final DateTime? completedAt;
 
   Reminder({
-    required this.id,
     required this.title,
+    this.parentId,
     this.description,
-    required this.date,
-    required this.repeat,
-    required this.category,
-    this.completedTime,
-    this.completedAt,
-    this.isCompleted = false,
-    this.children = const [],
-  });
+    this.date,
+    this.repeat = Repeat.never,
+    this.category,
+  }) {
+    id = Random().nextInt(100);
+    createdAt = DateTime.now();
+  }
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'title': title,
       'description': description,
-      'date': date.toIso8601String(),
+      'createdAt': createdAt.toIso8601String(),
+      'date': date?.toIso8601String(),
       'repeat': repeat.toString(),
       'category': category,
-      'isCompleted': isCompleted,
-      'completedTime': completedTime,
       'completedAt': completedAt,
-      'children': children,
+      'parent': parentId,
     };
   }
 
   void addChild(Reminder child) {
-    children.add(child);
+    child.parentId = id;
   }
 
   void removeChild(Reminder child) {
-    children.remove(child);
+    child.parentId = null;
   }
 }
 

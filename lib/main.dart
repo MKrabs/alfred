@@ -6,13 +6,11 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'pages/reminder.dart';
 import 'firebase_options.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
 
   runApp(
     MaterialApp(
@@ -21,6 +19,7 @@ void main() async {
       theme: ThemeData(
         useMaterial3: true,
       ),
+      darkTheme: ThemeData(brightness: Brightness.dark),
     ),
   );
 }
@@ -44,7 +43,7 @@ class _MyHomePageState extends State<Alfred> {
 
   List<Color> colors = [
     Colors.teal,
-    Colors.white,
+    Colors.redAccent,
     Colors.amber[600]!,
   ];
 
@@ -109,7 +108,10 @@ class _MyHomePageState extends State<Alfred> {
             duration: const Duration(milliseconds: 400),
             backgroundColor: Colors.black,
             color: Colors.white38,
-            tabBackgroundColor: Colors.white,
+            tabBackgroundColor:
+                (Theme.of(context).brightness == Brightness.light)
+                    ? Colors.white
+                    : Colors.white12,
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
             gap: 8,
             tabs: [
@@ -136,8 +138,8 @@ class _MyHomePageState extends State<Alfred> {
               });
               controller.animateToPage(
                 index,
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeInCubic,
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.fastOutSlowIn,
               );
             },
           ),
