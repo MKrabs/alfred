@@ -8,7 +8,7 @@ class ReminderPage extends StatefulWidget {
 
   const ReminderPage({super.key, required this.bgc, required this.nbr});
 
-  static List<Reminder> reminders =  [
+  static List<Reminder> reminders = [
     Reminder(
       title: "First",
       description: "Description 1",
@@ -30,7 +30,7 @@ class ReminderPage extends StatefulWidget {
     Reminder(
       title: "One",
       description:
-      "Description 3 but it's very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
+          "Description 3 but it's very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
       repeat: Repeat.weekly,
       category: 1,
     ),
@@ -149,7 +149,7 @@ class _ReminderPageState extends State<ReminderPage> {
                       title: const Text("Add"),
                       trailing: const Icon(Icons.add_box_rounded),
                       onTap: () {
-                        _displayDialog(context);
+                        _displayDialog(context, index.toString());
                       },
                     ),
                   ),
@@ -187,7 +187,8 @@ class _ReminderPageState extends State<ReminderPage> {
     );
   }
 
-  Future<Future> _displayDialog(BuildContext context, [int? parentId]) async {
+  Future<Future> _displayDialog(BuildContext context,
+      [String? parentId]) async {
     void clearAll() {
       _textFieldController.clear();
       _descriptionFieldController.clear();
@@ -319,13 +320,10 @@ class _ReminderPageState extends State<ReminderPage> {
       isScrollControlled: true,
       context: context,
       builder: (context) {
-        return ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height / 2,
-          ),
+        return SingleChildScrollView(
           child: ListView(
             shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+            physics: const ClampingScrollPhysics(),
             children: [
               const SizedBox(height: 16),
               ListTile(
@@ -340,11 +338,11 @@ class _ReminderPageState extends State<ReminderPage> {
               ListTile(
                 trailing: const Icon(Icons.calendar_today_outlined),
                 title: Text(
-                  "${ReminderPage.reminders[index].createdAt.year}"
-                  "/${ReminderPage.reminders[index].createdAt.month}"
-                  "/${ReminderPage.reminders[index].createdAt.day}"
-                  " - ${ReminderPage.reminders[index].createdAt.hour}"
-                  ":${ReminderPage.reminders[index].createdAt.minute}",
+                  "${ReminderPage.reminders[index].createdAt?.year}"
+                  "/${ReminderPage.reminders[index].createdAt?.month}"
+                  "/${ReminderPage.reminders[index].createdAt?.day}"
+                  " - ${ReminderPage.reminders[index].createdAt?.hour}"
+                  ":${ReminderPage.reminders[index].createdAt?.minute}",
                 ),
               ),
               ListTile(
