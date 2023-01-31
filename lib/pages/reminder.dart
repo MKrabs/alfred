@@ -14,6 +14,22 @@ class ReminderPage extends StatefulWidget {
       description: "Description 1",
       repeat: Repeat.weekly,
       category: 1,
+      children: [
+        Reminder(
+          title: "Child One",
+          description: "Child Description two but a bit longer",
+          date: DateTime(2023, 01, 27, 14, 31),
+          repeat: Repeat.weekly,
+          category: 1,
+        ),
+        Reminder(
+          title: "Child Two",
+          description: "Description two but a bit longer",
+          date: DateTime(2023, 01, 27, 14, 31),
+          repeat: Repeat.weekly,
+          category: 1,
+        ),
+      ],
     ),
     Reminder(
       title: "Two",
@@ -31,13 +47,6 @@ class ReminderPage extends StatefulWidget {
       title: "One",
       description:
           "Description 3 but it's very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very very long",
-      repeat: Repeat.weekly,
-      category: 1,
-    ),
-    Reminder(
-      title: "Two",
-      description: "Description two but a bit longer",
-      date: DateTime(2023, 01, 27, 14, 31),
       repeat: Repeat.weekly,
       category: 1,
     ),
@@ -149,7 +158,7 @@ class _ReminderPageState extends State<ReminderPage> {
                       title: const Text("Add"),
                       trailing: const Icon(Icons.add_box_rounded),
                       onTap: () {
-                        _displayDialog(context, index.toString());
+                        _displayDialog(context);
                       },
                     ),
                   ),
@@ -158,7 +167,9 @@ class _ReminderPageState extends State<ReminderPage> {
 
               index -= 1;
 
-              return reminderCard(index);
+              return reminderCard(
+                ReminderPage.reminders[index],
+              );
             },
           ),
         ),
@@ -166,29 +177,104 @@ class _ReminderPageState extends State<ReminderPage> {
     );
   }
 
-  Widget reminderCard(int index) {
+  Widget reminderCard(Reminder reminder) {
     return Card(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(10),
-        splashColor: Colors.brown.withOpacity(0.7),
-        child: ListTile(
-          title: Text(ReminderPage.reminders[index].title),
-          subtitle: Text(
-            "${ReminderPage.reminders[index].description}",
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+      child: Column(
+        children: [
+          InkWell(
+            borderRadius: BorderRadius.vertical(
+              top: const Radius.circular(10),
+              bottom: Radius.circular(reminder.children!.isNotEmpty ? 0 : 10),
+            ),
+            splashColor: Colors.brown.withOpacity(0.7),
+            child: ListTile(
+              title: Text(reminder.title),
+              subtitle: Text(
+                "${reminder.description}",
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              trailing: InkWell(
+                onTap: () {
+                  setState(() {
+                    reminder.completedAt =
+                        reminder.completedAt != null ? null : DateTime.now();
+                  });
+                },
+                child: Icon(
+                  reminder.completedAt != null
+                      ? Icons.check_box
+                      : Icons.check_box_outline_blank,
+                ),
+              ),
+            ),
+            onTap: () {
+              showReminder(context, reminder);
+            },
           ),
-          trailing: const Icon(Icons.donut_large),
-        ),
-        onTap: () {
-          showReminder(context, index);
-        },
+          if (reminder.children!.isNotEmpty)
+            Column(
+              children: [
+                Divider(
+                  indent: 16,
+                  endIndent: 16,
+                  height: 1,
+                  color: Theme.of(context).dividerColor.withOpacity(0.2),
+                ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: reminder.children!.length,
+                  itemBuilder: (context, childIndex) {
+                    if (childIndex == reminder.children!.length - 1) {}
+
+                    return InkWell(
+                      borderRadius: BorderRadius.vertical(
+                        bottom: Radius.circular(
+                          (childIndex == reminder.children!.length - 1)
+                              ? 10
+                              : 0,
+                        ),
+                      ),
+                      child: ListTile(
+                        dense: true,
+                        title: Text(reminder.children![childIndex].title),
+                        subtitle: Text(
+                          "${reminder.children![childIndex].description}",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        trailing: InkWell(
+                          onTap: () {
+                            setState(() {
+                              reminder.children![childIndex].completedAt =
+                                  reminder.children![childIndex].completedAt !=
+                                          null
+                                      ? null
+                                      : DateTime.now();
+                            });
+                          },
+                          child: Icon(
+                            reminder.children![childIndex].completedAt != null
+                                ? Icons.check_box
+                                : Icons.check_box_outline_blank,
+                          ),
+                        ),
+                      ),
+                      onTap: () {
+                        showReminder(context, reminder.children![childIndex]);
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+        ],
       ),
     );
   }
 
-  Future<Future> _displayDialog(BuildContext context,
-      [String? parentId]) async {
+  Future<Future> _displayDialog(BuildContext context) async {
     void clearAll() {
       _textFieldController.clear();
       _descriptionFieldController.clear();
@@ -237,6 +323,7 @@ class _ReminderPageState extends State<ReminderPage> {
                         lastDate: DateTime(2100),
                       );
                       if (date != null) {
+                        // ignore: use_build_context_synchronously
                         final time = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay.now(),
@@ -264,7 +351,7 @@ class _ReminderPageState extends State<ReminderPage> {
                     icon: const Icon(Icons.calendar_today_outlined),
                     label: Align(
                       alignment: Alignment.centerLeft,
-                      child: Text("${showTime(_dueDate)}"),
+                      child: Text(showTime(_dueDate)),
                     ),
                   ),
                 ],
@@ -286,7 +373,6 @@ class _ReminderPageState extends State<ReminderPage> {
                         title: _textFieldController.text,
                         description: description,
                         date: _dueDate,
-                        parentId: parentId,
                       ),
                     );
 
@@ -312,7 +398,7 @@ class _ReminderPageState extends State<ReminderPage> {
     );
   }
 
-  void showReminder(BuildContext context, int index) {
+  void showReminder(BuildContext context, Reminder reminder) {
     showModalBottomSheet(
       useSafeArea: true,
       enableDrag: true,
@@ -328,7 +414,7 @@ class _ReminderPageState extends State<ReminderPage> {
               const SizedBox(height: 16),
               ListTile(
                 title: Text(
-                  ReminderPage.reminders[index].title,
+                  reminder.title,
                   style: TextStyle(
                       fontSize:
                           Theme.of(context).textTheme.headlineMedium?.fontSize),
@@ -337,25 +423,48 @@ class _ReminderPageState extends State<ReminderPage> {
               ),
               ListTile(
                 trailing: const Icon(Icons.calendar_today_outlined),
-                title: Text(
-                  "${ReminderPage.reminders[index].createdAt?.year}"
-                  "/${ReminderPage.reminders[index].createdAt?.month}"
-                  "/${ReminderPage.reminders[index].createdAt?.day}"
-                  " - ${ReminderPage.reminders[index].createdAt?.hour}"
-                  ":${ReminderPage.reminders[index].createdAt?.minute}",
+                title: Text(formatDate(reminder.createdAt)),
+              ),
+              ListTile(
+                title: Text(formatDate(reminder.completedAt)),
+                trailing: Icon(
+                  reminder.completedAt != null
+                      ? Icons.event_available
+                      : Icons.event_busy,
                 ),
               ),
               ListTile(
                 title: Text(
-                  ReminderPage.reminders[index].repeat.name.toString(),
+                  reminder.description ?? "No description",
+                ),
+                trailing: const Icon(Icons.info_outline),
+              ),
+              ListTile(
+                title: Text(
+                  reminder.repeat.name.toString(),
                 ),
                 trailing: const Icon(Icons.event_repeat),
               ),
               ListTile(
-                title: Text(
-                  ReminderPage.reminders[index].description ?? "No description",
+                title: TextButton(
+                  onPressed: () {
+                    print(reminder.toMap());
+                  },
+                  child: const Text("print"),
                 ),
-                trailing: const Icon(Icons.info_outline),
+              ),
+              ListTile(
+                title: Center(
+                  child: Text(
+                    reminder.id ?? "No id ???",
+                    style: TextStyle(
+                      fontSize: Theme.of(context).textTheme.bodySmall?.fontSize,
+                      color: Theme.of(context).hintColor,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
+                trailing: const Icon(Icons.fingerprint),
               ),
             ],
           ),
@@ -384,6 +493,26 @@ class _ReminderPageState extends State<ReminderPage> {
     buffer.write(
       " - ${dueDate.hour.toString().padLeft(2, '0')}:${dueDate.minute.toString().padLeft(2, '0')}",
     );
+
+    return buffer.toString();
+  }
+
+  String formatDate(DateTime? date) {
+    if (date == null) {
+      return "no Date?";
+    }
+
+    var buffer = StringBuffer();
+
+    buffer.write(date.year.toString().padLeft(4, '0'));
+    buffer.write("/");
+    buffer.write(date.month.toString().padLeft(2, '0'));
+    buffer.write("/");
+    buffer.write(date.day.toString().padLeft(2, '0'));
+    buffer.write(" - ");
+    buffer.write(date.hour.toString().padLeft(2, '0'));
+    buffer.write(":");
+    buffer.write(date.minute.toString().padLeft(2, '0'));
 
     return buffer.toString();
   }

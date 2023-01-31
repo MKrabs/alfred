@@ -4,19 +4,19 @@ import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 
 class Reminder {
-  late final String? id;
-  String? parentId;
+  late final String id;
+  late List<Reminder>? children;
   final String title;
-  final String? description;
+  late final String? description;
   late final DateTime? createdAt;
   final DateTime? date;
   final Repeat repeat;
   final int? category;
-  late final DateTime? completedAt;
+  late DateTime? completedAt;
 
   Reminder({
     required this.title,
-    this.parentId,
+    this.children = const [],
     this.description,
     this.date,
     this.repeat = Repeat.never,
@@ -24,20 +24,21 @@ class Reminder {
   }) {
     id = const Uuid().v4();
     createdAt = DateTime.now();
+    completedAt = null;
   }
 
   void addChild(Reminder child) {
-    child.parentId = id;
+    children!.add(child);
   }
 
-  void removeChild(Reminder child) {
-    child.parentId = null;
+  bool removeChild(Reminder child) {
+    return children!.remove(child);
   }
 
   Reminder.fromMap(Map<String, dynamic> data)
-      : id = data['id'] ?? Uuid().v1(),
+      : id = data['id'] ?? const Uuid().v1(),
         title = data['title'],
-        parentId = data['parentId'],
+        children = data['children'],
         description = data['description'],
         createdAt = (data['createdAt'] as Timestamp).toDate(),
         date = (data['date'] as Timestamp).toDate(),
@@ -49,7 +50,7 @@ class Reminder {
     return {
       'id': id,
       'title': title,
-      'parentId': parentId,
+      'children': children,
       'description': description,
       'createdAt': createdAt,
       'date': date,
