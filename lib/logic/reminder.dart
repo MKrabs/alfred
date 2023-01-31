@@ -1,13 +1,14 @@
 import 'dart:math';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 
 class Reminder {
-  late final int id;
-  int? parentId;
+  late final String? id;
+  String? parentId;
   final String title;
   final String? description;
-  late final DateTime createdAt;
+  late final DateTime? createdAt;
   final DateTime? date;
   final Repeat repeat;
   final int? category;
@@ -21,22 +22,8 @@ class Reminder {
     this.repeat = Repeat.never,
     this.category,
   }) {
-    id = Random().nextInt(100);
+    id = const Uuid().v4();
     createdAt = DateTime.now();
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'createdAt': createdAt.toIso8601String(),
-      'date': date?.toIso8601String(),
-      'repeat': repeat.toString(),
-      'category': category,
-      'completedAt': completedAt,
-      'parent': parentId,
-    };
   }
 
   void addChild(Reminder child) {
@@ -46,6 +33,31 @@ class Reminder {
   void removeChild(Reminder child) {
     child.parentId = null;
   }
+
+  Reminder.fromMap(Map<String, dynamic> data)
+      : id = data['id'] ?? Uuid().v1(),
+        title = data['title'],
+        parentId = data['parentId'],
+        description = data['description'],
+        createdAt = (data['createdAt'] as Timestamp).toDate(),
+        date = (data['date'] as Timestamp).toDate(),
+        repeat = Repeat.values[data['repeat']],
+        category = data['category'],
+        completedAt = (data['completedAt'] as Timestamp).toDate();
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'parentId': parentId,
+      'description': description,
+      'createdAt': createdAt,
+      'date': date,
+      'repeat': repeat.index,
+      'category': category,
+      'completedAt': completedAt,
+    };
+  }
 }
 
 enum Repeat {
@@ -53,5 +65,5 @@ enum Repeat {
   daily,
   weekly,
   monthly,
-  yearly,
+  yearly;
 }
