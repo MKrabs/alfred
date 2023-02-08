@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 
 import '../logic/reminder.dart';
+import '../logic/timeformat.dart';
 import '../pages/reminder.dart';
 
 class ReminderDialog extends StatefulWidget {
+  final Reminder? rem;
+
+  const ReminderDialog({super.key, this.rem});
 
   @override
   _ReminderDialogState createState() => _ReminderDialogState();
 }
 
 class _ReminderDialogState extends State<ReminderDialog> {
+  Reminder? reminder;
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -19,18 +24,21 @@ class _ReminderDialogState extends State<ReminderDialog> {
   DateTime? _dueDate;
   DateTime currentDate = DateTime.now();
 
-  void _saveReminder(Reminder reminder) async {
+  void _saveReminder(Reminder reminder, {Reminder? update}) async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      await reminder.storeInFirestore().whenComplete(() => () {
-            setState(() {
-              ReminderPage.reminders.add(reminder);
+      if (update != null) {
+        await update.updateReminder(reminder);
+      } else {
+        await reminder.storeInFirestore().whenComplete(() => () {
+              setState(() {
+                ReminderPage.reminders.add(reminder);
+              });
             });
-          });
-
+      }
       Navigator.of(context).pop();
     } catch (e) {
       setState(() {
@@ -41,9 +49,24 @@ class _ReminderDialogState extends State<ReminderDialog> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    reminder = widget.rem;
+    _textFieldController.text = "${reminder?.title}";
+    if (reminder?.description != null) {
+      _descriptionFieldController.text = "${reminder?.description}";
+    }
+    if (reminder?.date != null) {
+      _dueDate = reminder?.date;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Add a task to your list'),
+      title: (reminder == null)
+          ? const Text('Add a task to your list')
+          : Text("Edit: ${reminder!.title}", maxLines: 1),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -66,7 +89,7 @@ class _ReminderDialogState extends State<ReminderDialog> {
             onPressed: () async {
               final date = await showDatePicker(
                 context: context,
-                initialDate: currentDate,
+                initialDate: _dueDate ?? currentDate,
                 firstDate: DateTime(1900),
                 lastDate: DateTime(2100),
               );
@@ -99,7 +122,7 @@ class _ReminderDialogState extends State<ReminderDialog> {
             icon: const Icon(Icons.calendar_today_outlined),
             label: Align(
               alignment: Alignment.centerLeft,
-              child: Text(showTime(_dueDate)),
+              child: Text(TimeFormat.formatDate(_dueDate)),
             ),
           ),
         ],
@@ -109,20 +132,18 @@ class _ReminderDialogState extends State<ReminderDialog> {
         TextButton(
           child: _isLoading
               ? const CircularProgressIndicator()
-              : const Text('ADD'),
+              : reminder == null
+                  ? const Text('ADD')
+                  : const Text("UPDATE"),
           onPressed: () async {
-            String? description;
-            if (_descriptionFieldController.text.isNotEmpty) {
-              description = _descriptionFieldController.text;
-            }
-
             _saveReminder(
               Reminder(
                 title: _textFieldController.text,
-                description: description,
+                description: _descriptionFieldController.text,
                 date: _dueDate,
                 createdAt: DateTime.now(),
               ),
+              update: reminder,
             );
           },
         ), // cancel button
@@ -142,49 +163,5 @@ class _ReminderDialogState extends State<ReminderDialog> {
     _descriptionFieldController.clear();
     _dueDate = null;
     currentDate = DateTime.now();
-  }
-
-  String showTime(DateTime? dueDate) {
-    if (dueDate == null) {
-      return "no Date";
-    }
-
-    var buffer = StringBuffer();
-
-    buffer.write(
-      "${dueDate.hour.toString().padLeft(2, '0')}:${dueDate.minute.toString().padLeft(2, '0')} - ",
-    );
-
-    final difference = dueDate.difference(currentDate).inDays;
-    if (difference < 7) {
-      buffer.write("in $difference days");
-    } else if (difference < 365) {
-      final months = difference ~/ 30;
-      buffer.write("in $months months");
-    } else {
-      buffer.write("$dueDate");
-    }
-
-    return buffer.toString();
-  }
-
-  String? formatDate(DateTime? date) {
-    if (date == null) {
-      return null;
-    }
-
-    var buffer = StringBuffer();
-
-    buffer.write(date.hour.toString().padLeft(2, '0'));
-    buffer.write(":");
-    buffer.write(date.minute.toString().padLeft(2, '0'));
-    buffer.write(" - ");
-    buffer.write(date.year.toString().padLeft(4, '0'));
-    buffer.write("/");
-    buffer.write(date.month.toString().padLeft(2, '0'));
-    buffer.write("/");
-    buffer.write(date.day.toString().padLeft(2, '0'));
-
-    return buffer.toString();
   }
 }

@@ -42,14 +42,13 @@ class Reminder {
       "date": date,
       "completedAt": completedAt,
       "tasks": children
-          ?.map((task) =>
-      {
-        "title": task.title,
-        "description": task.description,
-        "done": task.done,
-      })
+          ?.map((task) => {
+                "title": task.title,
+                "description": task.description,
+                "done": task.done,
+              })
           .toList(),
-    });
+    }).onError((error, stackTrace) => throw Error());
   }
 
   static Future<List<Reminder>> readReminders() async {
@@ -80,7 +79,7 @@ class Reminder {
             ? (data["createdAt"] as Timestamp).toDate()
             : null,
         date:
-        data["date"] != null ? (data["date"] as Timestamp).toDate() : null,
+            data["date"] != null ? (data["date"] as Timestamp).toDate() : null,
         completedAt: data["completedAt"] != null
             ? (data["completedAt"] as Timestamp).toDate()
             : null,
@@ -89,6 +88,33 @@ class Reminder {
     }
 
     return reminders;
+  }
+
+  Future<DateTime?> updateReminder(Reminder reminder) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    final docRef = FirebaseFirestore.instance
+        .collection("users")
+        .doc(user?.uid)
+        .collection("reminders")
+        .doc(id);
+
+    await docRef.update({
+      "title": reminder.title,
+      "description": reminder.description,
+      "createdAt": reminder.createdAt,
+      "date": reminder.date,
+      "completedAt": reminder.completedAt,
+      "tasks": reminder.children
+          ?.map((task) => {
+                "title": task.title,
+                "description": task.description,
+                "done": task.done,
+              })
+          .toList(),
+    });
+
+    return reminder.date;
   }
 
   Future<DateTime?> updateCompletion(DateTime? dateTime) async {

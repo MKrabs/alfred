@@ -1,7 +1,11 @@
 import 'package:alfred/logic/reminder.dart';
+import 'package:alfred/logic/timeformat.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:alfred/components/ReminderDialog.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import 'package:intl/intl.dart';
+
 
 class ReminderPage extends StatefulWidget {
   final Color bgc;
@@ -28,6 +32,7 @@ class _ReminderPageState extends State<ReminderPage> {
 
   @override
   void initState() {
+    timeago.setLocaleMessages('de', timeago.DeMessages());
     super.initState();
     updateReminders();
   }
@@ -69,7 +74,7 @@ class _ReminderPageState extends State<ReminderPage> {
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
-                              return ReminderDialog();
+                              return const ReminderDialog();
                             },
                           ).then((value) => () {
                                 _scrollController.animateTo(
@@ -139,13 +144,27 @@ class _ReminderPageState extends State<ReminderPage> {
                 },
                 child: Icon(
                   reminder.completedAt != null
-                      ? Icons.check_box
-                      : Icons.check_box_outline_blank,
+                      ? Icons.check_box_rounded
+                      : Icons.check_box_outline_blank_rounded,
                 ),
               ),
             ),
             onTap: () {
               showReminder(context, reminder);
+            },
+            onLongPress: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return ReminderDialog(rem: reminder,);
+                },
+              ).then((value) => () {
+                _scrollController.animateTo(
+                  _scrollController.position.maxScrollExtent,
+                  duration: const Duration(milliseconds: 330),
+                  curve: Curves.easeInOut,
+                );
+              });
             },
           ),
           if (reminder.children!.isNotEmpty)
@@ -184,8 +203,8 @@ class _ReminderPageState extends State<ReminderPage> {
                           },
                           child: Icon(
                             reminder.children![childIndex].done
-                                ? Icons.check_box
-                                : Icons.check_box_outline_blank,
+                                ? Icons.check_box_rounded
+                                : Icons.check_box_outline_blank_rounded,
                           ),
                         ),
                       ),
@@ -201,7 +220,6 @@ class _ReminderPageState extends State<ReminderPage> {
 
   void showReminder(BuildContext context, Reminder reminder) {
     showModalBottomSheet(
-      useSafeArea: true,
       enableDrag: true,
       isDismissible: true,
       isScrollControlled: true,
@@ -221,23 +239,27 @@ class _ReminderPageState extends State<ReminderPage> {
                       fontSize:
                           Theme.of(context).textTheme.headlineMedium?.fontSize),
                 ),
-                trailing: const Icon(Icons.title),
+                trailing: const Icon(Icons.title_rounded),
               ),
+              if (reminder.createdAt != null)
+                ListTile(
+                  title: Text("created at: ${TimeFormat.formatDate(reminder.createdAt)}"),
+                  subtitle: Text(TimeFormat.formatDate(reminder.createdAt, exact: true)),
+                ),
               ListTile(
                 trailing: Icon(
                   reminder.completedAt != null
                       ? Icons.event_available
                       : Icons.event_busy,
                 ),
-                title:
-                    Text(formatDate(reminder.createdAt) ?? "No creation date."),
-                subtitle: Text(formatDate(reminder.completedAt) ?? "Open"),
+                title: Text(TimeFormat.formatDate(reminder.completedAt)),
+                subtitle: Text(TimeFormat.formatDate(reminder.date)),
               ),
               ListTile(
                 title: Text(
                   reminder.description ?? "No description",
                 ),
-                trailing: const Icon(Icons.info_outline),
+                trailing: const Icon(Icons.info_outline_rounded),
               ),
               ListTile(
                 title: Center(
@@ -250,7 +272,7 @@ class _ReminderPageState extends State<ReminderPage> {
                     ),
                   ),
                 ),
-                trailing: const Icon(Icons.fingerprint),
+                trailing: const Icon(Icons.fingerprint_rounded),
               ),
             ],
           ),
@@ -279,26 +301,6 @@ class _ReminderPageState extends State<ReminderPage> {
     } else {
       buffer.write("$dueDate");
     }
-
-    return buffer.toString();
-  }
-
-  String? formatDate(DateTime? date) {
-    if (date == null) {
-      return null;
-    }
-
-    var buffer = StringBuffer();
-
-    buffer.write(date.hour.toString().padLeft(2, '0'));
-    buffer.write(":");
-    buffer.write(date.minute.toString().padLeft(2, '0'));
-    buffer.write(" - ");
-    buffer.write(date.year.toString().padLeft(4, '0'));
-    buffer.write("/");
-    buffer.write(date.month.toString().padLeft(2, '0'));
-    buffer.write("/");
-    buffer.write(date.day.toString().padLeft(2, '0'));
 
     return buffer.toString();
   }
