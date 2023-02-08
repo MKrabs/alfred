@@ -127,7 +127,7 @@ class _ReminderDialogState extends State<ReminderDialog> {
             icon: const Icon(Icons.calendar_today_outlined),
             label: Align(
               alignment: Alignment.centerLeft,
-              child: Text(TimeFormat.formatDate(_dueDate)),
+              child: Text(TimeFormat.formatDate(_dueDate) ?? "Not set."),
             ),
           ),
         ],

@@ -1,9 +1,9 @@
 import 'package:intl/intl.dart';
 
 class TimeFormat {
-  static String formatDate(DateTime? date, {bool? exact}) {
+  static String? formatDate(DateTime? date, {bool? exact}) {
     if (date == null) {
-      return "No Due Date.";
+      return null;
     }
 
     if (exact == true) {

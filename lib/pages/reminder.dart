@@ -6,7 +6,6 @@ import 'package:alfred/components/ReminderDialog.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:intl/intl.dart';
 
-
 class ReminderPage extends StatefulWidget {
   final Color bgc;
   final String nbr;
@@ -156,15 +155,17 @@ class _ReminderPageState extends State<ReminderPage> {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return ReminderDialog(rem: reminder,);
+                  return ReminderDialog(
+                    rem: reminder,
+                  );
                 },
               ).then((value) => () {
-                _scrollController.animateTo(
-                  _scrollController.position.maxScrollExtent,
-                  duration: const Duration(milliseconds: 330),
-                  curve: Curves.easeInOut,
-                );
-              });
+                    _scrollController.animateTo(
+                      _scrollController.position.maxScrollExtent,
+                      duration: const Duration(milliseconds: 330),
+                      curve: Curves.easeInOut,
+                    );
+                  });
             },
           ),
           if (reminder.children!.isNotEmpty)
@@ -239,26 +240,27 @@ class _ReminderPageState extends State<ReminderPage> {
                       fontSize:
                           Theme.of(context).textTheme.headlineMedium?.fontSize),
                 ),
+                subtitle: reminder.date != null
+                    ? Text("Date: ${TimeFormat.formatDate(reminder.date)}")
+                    : null,
                 trailing: const Icon(Icons.title_rounded),
               ),
-              if (reminder.createdAt != null)
-                ListTile(
-                  title: Text("created at: ${TimeFormat.formatDate(reminder.createdAt)}"),
-                  subtitle: Text(TimeFormat.formatDate(reminder.createdAt, exact: true)),
-                ),
               ListTile(
                 trailing: Icon(
                   reminder.completedAt != null
                       ? Icons.event_available
                       : Icons.event_busy,
                 ),
-                title: Text(TimeFormat.formatDate(reminder.completedAt)),
-                subtitle: Text(TimeFormat.formatDate(reminder.date)),
+                title: reminder.completedAt != null
+                    ? Text("${TimeFormat.formatDate(reminder.completedAt)}")
+                    : const Text("Open"),
+                subtitle: (reminder.createdAt != null)
+                    ? Text(
+                    "Created: ${TimeFormat.formatDate(reminder.createdAt)}")
+                    : null,
               ),
               ListTile(
-                title: Text(
-                  reminder.description ?? "No description",
-                ),
+                subtitle: Text(reminder.description ?? "No description"),
                 trailing: const Icon(Icons.info_outline_rounded),
               ),
               ListTile(
