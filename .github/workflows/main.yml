@@ -15,13 +15,13 @@ jobs:
           java-version: '12.x'
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.3.10'
+          flutter-version: '3.7.0'
           channel: 'stable'
       - run: flutter pub get
       - run: flutter build apk --split-per-abi
       - name: Create Release
         uses: ncipollo/release-action@v1.12.0
         with:
-          artifacts: "build/app/outputs/flutter-apk/app-release.apk"
+          artifacts: "build/app/outputs/apk/*.apk"
           tag: v1.0.${{ github.run_number }}
           token: ${{ secrets.RELEASE_TOKEN }}
