@@ -90,7 +90,7 @@ class Reminder {
     return reminders;
   }
 
-  Future<DateTime?> updateReminder(Reminder reminder) async {
+  Future<void> updateReminder(Reminder reminder) async {
     final user = FirebaseAuth.instance.currentUser;
 
     final docRef = FirebaseFirestore.instance
@@ -113,8 +113,6 @@ class Reminder {
               })
           .toList(),
     });
-
-    return reminder.date;
   }
 
   Future<DateTime?> updateCompletion(DateTime? dateTime) async {
@@ -131,6 +129,18 @@ class Reminder {
     });
 
     return dateTime;
+  }
+
+
+
+  Future<void> delete() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(user?.uid)
+        .collection("reminders")
+        .doc(id).delete();
   }
 }
 

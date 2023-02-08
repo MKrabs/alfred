@@ -24,14 +24,19 @@ class _ReminderDialogState extends State<ReminderDialog> {
   DateTime? _dueDate;
   DateTime currentDate = DateTime.now();
 
-  void _saveReminder(Reminder reminder, {Reminder? update}) async {
+  void _saveReminder(Reminder reminder,
+      {Reminder? update, bool? delete}) async {
     setState(() {
       _isLoading = true;
     });
 
     try {
       if (update != null) {
-        await update.updateReminder(reminder);
+        if (delete == true) {
+          await update.delete();
+        } else {
+          await update.updateReminder(reminder);
+        }
       } else {
         await reminder.storeInFirestore().whenComplete(() => () {
               setState(() {
@@ -128,32 +133,48 @@ class _ReminderDialogState extends State<ReminderDialog> {
         ],
       ),
       actions: <Widget>[
-        // add button
-        TextButton(
-          child: _isLoading
-              ? const CircularProgressIndicator()
-              : reminder == null
-                  ? const Text('ADD')
-                  : const Text("UPDATE"),
-          onPressed: () async {
-            _saveReminder(
-              Reminder(
-                title: _textFieldController.text,
-                description: _descriptionFieldController.text,
-                date: _dueDate,
-                createdAt: DateTime.now(),
-              ),
-              update: reminder,
-            );
-          },
-        ), // cancel button
+        if (reminder != null && !_isLoading)
+          TextButton(
+            child: const Text("DELETE",
+                style: TextStyle(
+                  color: Colors.red,
+                )),
+            onPressed: () {
+              _saveReminder(
+                Reminder(
+                  title: _textFieldController.text,
+                  description: _descriptionFieldController.text,
+                  date: _dueDate,
+                  createdAt: DateTime.now(),
+                ),
+                update: reminder,
+                delete: true,
+              );
+            },
+          ),
+        if (!_isLoading)
+          TextButton(
+            child: reminder == null ? const Text('ADD') : const Text("UPDATE"),
+            onPressed: () async {
+              _saveReminder(
+                Reminder(
+                  title: _textFieldController.text,
+                  description: _descriptionFieldController.text,
+                  date: _dueDate,
+                  createdAt: DateTime.now(),
+                ),
+                update: reminder,
+              );
+            },
+          ),
+        if (_isLoading) const CircularProgressIndicator(),
         TextButton(
           child: const Text('CANCEL'),
           onPressed: () {
             clearAll();
             Navigator.of(context).pop();
           },
-        )
+        ),
       ],
     );
   }

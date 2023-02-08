@@ -50,6 +50,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     height: MediaQuery.of(context).size.height,
                     child: ListView(
                       children: [
+                        const SizedBox(height: 30),
                         ListTile(
                           leading: user == null
                               ? const FaIcon(FontAwesomeIcons.doorOpen)
@@ -103,6 +104,10 @@ class _SettingsPageState extends State<SettingsPage> {
                             onPressed: signOut,
                             icon: const Icon(Icons.bedtime_outlined),
                             label: const Text("Sign out"),
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStatePropertyAll(Colors.amber[700]),
+                            ),
                           )
                         else
                           Row(
