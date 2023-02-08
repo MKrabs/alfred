@@ -280,28 +280,4 @@ class _ReminderPageState extends State<ReminderPage> {
       },
     );
   }
-
-  String showTime(DateTime? dueDate) {
-    if (dueDate == null) {
-      return "no Date";
-    }
-
-    var buffer = StringBuffer();
-
-    buffer.write(
-      "${dueDate.hour.toString().padLeft(2, '0')}:${dueDate.minute.toString().padLeft(2, '0')} - ",
-    );
-
-    final difference = dueDate.difference(currentDate).inDays;
-    if (difference < 7) {
-      buffer.write("in $difference days");
-    } else if (difference < 365) {
-      final months = difference ~/ 30;
-      buffer.write("in $months months");
-    } else {
-      buffer.write("$dueDate");
-    }
-
-    return buffer.toString();
-  }
 }

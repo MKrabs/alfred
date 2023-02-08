@@ -142,7 +142,6 @@ class _SettingsPageState extends State<SettingsPage> {
       password: passwordController.text.trim(),
     )
         .then((value) {
-      // do something when success
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('An error occurred: ${error}')),
